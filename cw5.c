@@ -5,9 +5,9 @@ int main() {
     int kod;
 
     printf("Podaj znak ASCII lub kod ASCII: ");
-    scanf(" %c", &znak);
+    scanf("%c", &znak);
 
-    if ((znak >= && znak <= 'Z') || (znak >= 'a' && znak <= 'z')) {
+    if ((znak >= 'A' && znak <= 'Z') || (znak >= 'a' && znak <= 'z')) {
         printf("Znak '%c' jest literą alfabetu.\n", znak);
     } else {
         kod = (int)znak;
