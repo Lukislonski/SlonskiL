@@ -1,0 +1,59 @@
+import csv
+import json
+
+def load_csv(path):
+    with open(path, newline='', encoding='utf-8') as csvfile:
+        reader = csv.DictReader(csvfile)
+        return [row for row in reader]
+
+def load_json(path):
+    with open(path, encoding='utf-8') as f:
+        return json.load(f)
+
+def save_csv(data, path, fieldnames):
+    with open(path, 'w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for row in data:
+            writer.writerow(row)
+
+
+def filter_routes(routes, min_length=0, max_difficulty=5, region=None):
+    filtered = []
+    for r in routes:
+        try:
+            length = float(r["length_km"])
+            difficulty = int(r["difficulty"])
+            if length >= min_length and difficulty <= max_difficulty:
+                if region is None or r["region"] == region:
+                    filtered.append(r)
+        except (ValueError, KeyError):
+            continue
+    return filtered
+
+def compute_weather_stats(weather_data, region):
+    filtered = [w for w in weather_data if w["location_id"] == region]
+    if not filtered:
+        return None
+    try:
+        avg_temp = sum(float(w["avg_temp"]) for w in filtered) / len(filtered)
+        total_precip = sum(float(w["total_precip"]) for w in filtered)
+        sunny_days = sum(int(w["sunny_days"]) for w in filtered)
+        return {
+            "location_id": region,
+            "avg_temp": round(avg_temp, 1),
+            "total_precip": round(total_precip, 1),
+            "sunny_days": sunny_days
+        }
+    except (ValueError, KeyError):
+        return None
+
+def get_difficulty_summary(routes):
+    summary = {}
+    for r in routes:
+        try:
+            diff = int(r["difficulty"])
+            summary[diff] = summary.get(diff, 0) + 1
+        except (ValueError, KeyError):
+            continue
+    return summary
